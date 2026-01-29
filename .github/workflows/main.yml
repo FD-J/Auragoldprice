@@ -1,0 +1,26 @@
+name: Price Update Bot
+on:
+  schedule:
+    - cron: '0,10,20,30,40,50 * * * *'
+  workflow_dispatch: # Allows manual run
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write # Allows the bot to push the new HTML file
+    steps:
+      - uses: actions/checkout@v4
+      - name: Wait 30s
+        run: sleep 30
+      - name: Install Requests
+        run: pip install requests
+      - name: Run Script
+        run: python update_rates.py
+      - name: Push Changes
+        run: |
+          git config --global user.name "Bot"
+          git config --global user.email "bot@github.com"
+          git add index.html
+          git commit -m "Auto-update prices" || exit 0
+          git push

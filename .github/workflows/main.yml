@@ -1,6 +1,6 @@
 name: Price Update Bot
 on:
-  schedule:
+  schedule: 
     - cron: '0,10,20,30,40,50 * * * *'
   workflow_dispatch: # Allows manual run
 

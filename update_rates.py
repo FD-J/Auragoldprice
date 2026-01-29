@@ -1,6 +1,6 @@
 import requests
 import datetime
-
+ 
 # 1. API URLs
 G_URL = "https://api.auragold.in/api/data/v1/prices?product=24KGOLD"
 S_URL = "https://api.auragold.in/api/data/v1/prices?product=24KSILVER"

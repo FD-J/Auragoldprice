@@ -3,77 +3,270 @@
 <head>
 <meta charset="UTF-8">
 <title>FDJ Live Rates</title>
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
 <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600&display=swap" rel="stylesheet">
+
 <style>
-* { box-sizing: border-box; font-family: 'Poppins', sans-serif; }
-body { background: linear-gradient(135deg,#020617,#020617,#020617,#020617); height:100vh; display:flex; justify-content:center; align-items:center; color:white; margin:0; }
-.card { background: rgba(30,41,59,0.9); width:360px; padding:28px; border-radius:22px; box-shadow:0 25px 60px rgba(0,0,0,0.7); backdrop-filter: blur(10px); }
-h2 { text-align:center; color:#facc15; margin-bottom:25px; font-weight:600; }
-.section { background: rgba(255,255,255,0.04); padding:15px; border-radius:14px; margin-bottom:15px; }
-.label { font-size:13px; color:#94a3b8; margin-bottom:8px; }
-.row { display:flex; justify-content:space-between; margin:6px 0; font-size:17px; }
-.price { color:#facc15; font-weight:600; }
-.footer { text-align:center; font-size:12px; margin-top:15px; color:#94a3b8; }
+
+*{
+    box-sizing:border-box;
+    font-family:'Poppins',sans-serif;
+}
+
+body{
+    margin:0;
+    height:100vh;
+    background:linear-gradient(135deg,#020617,#020617,#020617);
+    display:flex;
+    justify-content:center;
+    align-items:center;
+    color:white;
+}
+
+/* Card */
+
+.card{
+    width:360px;
+    background:rgba(30,41,59,0.95);
+    padding:28px;
+    border-radius:22px;
+    box-shadow:0 25px 60px rgba(0,0,0,0.7);
+    backdrop-filter:blur(10px);
+    animation:fadeIn 1s ease;
+}
+
+@keyframes fadeIn{
+    from{opacity:0;transform:translateY(30px);}
+    to{opacity:1;transform:translateY(0);}
+}
+
+h2{
+    text-align:center;
+    color:#facc15;
+    margin-bottom:25px;
+    font-weight:600;
+}
+
+/* Sections */
+
+.section{
+    background:rgba(255,255,255,0.05);
+    padding:15px;
+    border-radius:14px;
+    margin-bottom:15px;
+}
+
+.label{
+    font-size:13px;
+    color:#94a3b8;
+    margin-bottom:8px;
+}
+
+.row{
+    display:flex;
+    justify-content:space-between;
+    margin:6px 0;
+    font-size:17px;
+}
+
+.price{
+    color:#facc15;
+    font-weight:600;
+}
+
+/* Footer */
+
+.footer{
+    text-align:center;
+    font-size:12px;
+    margin-top:15px;
+    color:#94a3b8;
+}
+
+.refresh{
+    font-size:11px;
+    margin-top:4px;
+    color:#64748b;
+}
+
+/* Loading */
+
+.loading{
+    text-align:center;
+    font-size:14px;
+    color:#facc15;
+    margin-bottom:15px;
+}
+
 </style>
 </head>
+
 <body>
 
 <div class="card">
-  <h2>FDJ Live Rates</h2>
 
-  <div class="section" id="goldSection">
-    <div class="label">Gold 24K (1 g)</div>
-    <div class="row"><span>Buy</span><span class="price" id="goldBuy">--</span></div>
-    <div class="row"><span>Sell</span><span class="price" id="goldSell">--</span></div>
-  </div>
+<h2>FDJ Live Rates</h2>
 
-  <div class="section" id="silverSection">
-    <div class="label">Silver (1 g)</div>
-    <div class="row"><span>Buy</span><span class="price" id="silverBuy">--</span></div>
-    <div class="row"><span>Sell</span><span class="price" id="silverSell">--</span></div>
-  </div>
+<div class="loading" id="loading">
+Loading latest prices...
+</div>
 
-  <div class="footer">
-    Last Updated<br><b id="lastUpdated">--</b>
-    <div class="refresh">Auto Refresh: 10 min 30 sec</div>
-  </div>
+<!-- GOLD -->
+
+<div class="section">
+
+<div class="label">Gold 24K (1 g)</div>
+
+<div class="row">
+<span>Buy</span>
+<span class="price" id="goldBuy">--</span>
+</div>
+
+<div class="row">
+<span>Sell</span>
+<span class="price" id="goldSell">--</span>
+</div>
+
+</div>
+
+<!-- SILVER -->
+
+<div class="section">
+
+<div class="label">Silver (1 g)</div>
+
+<div class="row">
+<span>Buy</span>
+<span class="price" id="silverBuy">--</span>
+</div>
+
+<div class="row">
+<span>Sell</span>
+<span class="price" id="silverSell">--</span>
+</div>
+
+</div>
+
+<!-- FOOTER -->
+
+<div class="footer">
+
+Last Updated<br>
+<b id="lastTime">--</b>
+
+<div class="refresh">
+Auto Refresh: 10 min 30 sec
+</div>
+
+</div>
+
 </div>
 
 <script>
-const GOLD_API = "https://api.auragold.in/api/data/v1/prices?product=24KGOLD";
-const SILVER_API = "https://api.auragold.in/api/data/v1/prices?product=24KSILVER";
 
-async function fetchData(url) {
-  const ts = new Date().getTime();
-  const res = await fetch(`${url}&t=${ts}`, {cache: "no-cache"});
-  const json = await res.json();
-  return json.data;
+/* API URLs */
+
+const GOLD_API =
+"https://api.auragold.in/api/data/v1/prices?product=24KGOLD";
+
+const SILVER_API =
+"https://api.auragold.in/api/data/v1/prices?product=24KSILVER";
+
+
+/* Fetch API */
+
+async function getData(url){
+
+    const ts = Date.now();
+
+    const res = await fetch(url + "&t=" + ts,{
+        cache:"no-cache"
+    });
+
+    const json = await res.json();
+
+    return json.data;
 }
 
-async function updateRates() {
-  try {
-    const gold = await fetchData(GOLD_API);
-    const silver = await fetchData(SILVER_API);
 
-    document.getElementById("goldBuy").textContent = `₹ ${parseFloat(gold.aura_buy_price).toLocaleString('en-IN',{minimumFractionDigits:2})}`;
-    document.getElementById("goldSell").textContent = `₹ ${parseFloat(gold.aura_sell_price).toLocaleString('en-IN',{minimumFractionDigits:2})}`;
+/* Format Currency */
 
-    document.getElementById("silverBuy").textContent = `₹ ${parseFloat(silver.aura_buy_price).toLocaleString('en-IN',{minimumFractionDigits:2})}`;
-    document.getElementById("silverSell").textContent = `₹ ${parseFloat(silver.aura_sell_price).toLocaleString('en-IN',{minimumFractionDigits:2})}`;
+function formatPrice(val){
 
-    const updatedTime = new Date(gold.created_at).toLocaleString('en-GB', {day:'2-digit', month:'2-digit', year:'numeric', hour:'2-digit', minute:'2-digit'});
-    document.getElementById("lastUpdated").textContent = updatedTime;
-
-  } catch (e) {
-    console.error("API Error:", e);
-  }
+    return "₹ " + Number(val)
+        .toLocaleString("en-IN",{
+            minimumFractionDigits:2
+        });
 }
 
-// Initial load
+
+/* Update Page */
+
+async function updateRates(){
+
+    try{
+
+        document.getElementById("loading").style.display="block";
+
+        const gold = await getData(GOLD_API);
+        const silver = await getData(SILVER_API);
+
+
+        /* Gold */
+
+        document.getElementById("goldBuy").innerText =
+            formatPrice(gold.aura_buy_price);
+
+        document.getElementById("goldSell").innerText =
+            formatPrice(gold.aura_sell_price);
+
+
+        /* Silver */
+
+        document.getElementById("silverBuy").innerText =
+            formatPrice(silver.aura_buy_price);
+
+        document.getElementById("silverSell").innerText =
+            formatPrice(silver.aura_sell_price);
+
+
+        /* Time */
+
+        const time = new Date(gold.created_at)
+            .toLocaleString("en-GB",{
+                day:"2-digit",
+                month:"2-digit",
+                year:"numeric",
+                hour:"2-digit",
+                minute:"2-digit"
+            });
+
+        document.getElementById("lastTime").innerText = time;
+
+
+        document.getElementById("loading").style.display="none";
+
+    }catch(err){
+
+        console.log("API Error:",err);
+
+        document.getElementById("loading").innerText =
+        "Unable to load data";
+    }
+}
+
+
+/* First Load */
+
 updateRates();
 
-// Refresh every 10 min 30 sec
-setInterval(updateRates, 630000);
+
+/* Auto Refresh 10m 30s */
+
+setInterval(updateRates,630000);
+
 </script>
 
 </body>
